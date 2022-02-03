@@ -1,4 +1,4 @@
-# Terrain-Generation
+# Terrain Generation
 
 Mesh Terrain Generation in Unity.
 
