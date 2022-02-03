@@ -1,10 +1,10 @@
-# Terrain-Generation
+# Terrain Generation
 
 Mesh Terrain Generation in Unity.
 
 ![Screenshot](/Images/screen.png)
 
-A small, work in progress project, using [Auburn's Fast Noise Lite](https://github.com/Auburn/FastNoiseLite) to build mesh terrains in Unity from fractal noise.
+A small, work in progress project, using [Auburn's Fast Noise Lite](https://github.com/Auburn/FastNoiseLite) to build mesh terrains in Unity from fractal noise in real time.
 Currently it will just generate a single tile, at a maximum size of 256x256 (65,536) vertices before reaching Unity's mesh size limit.
 
 ## Planned features:
@@ -20,4 +20,4 @@ Currently it will just generate a single tile, at a maximum size of 256x256 (65,
 - [ ] Roads
 - [ ] Towns
 
-
+Created with Unity Version 2020.3.17f1, Built in Render Pipeline.
