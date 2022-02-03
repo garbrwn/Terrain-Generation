@@ -13,7 +13,10 @@ public class TerrainGenerator : MonoBehaviour
     [Range(0f, 0.04f)]
     public float frequency;
     public float lacunarity;
+    [Range(0f, 180f)]
+    public float steepness;
 
+    public Texture2D splatTexture;
 
     public Material TerrainMaterial;
 
@@ -39,11 +42,40 @@ public class TerrainGenerator : MonoBehaviour
         GenerateHeightMap();
  
         BuildMesh();
+        GenerateSplatTexture();
     }
 
     private void GenerateHeightMap()
     {
         heightMap = new HeightMap(mapSize, heightMultiplier, pointSpacing, octaves, frequency, lacunarity);
+    }
+
+    private void GenerateSplatTexture()
+    {
+        splatTexture = new Texture2D(mapSize, mapSize);
+        Color[] pixels = new Color[mapSize * mapSize];
+
+        int i = 0;
+        for (int x = 0; x < mapSize; x++)
+        {
+            for (int y = 0; y < mapSize; y++)
+            {
+                float angle = Vector3.Angle(meshFilter.sharedMesh.normals[i], Vector3.up);
+                if (angle < steepness)
+                    pixels[i] = Color.white;
+                else
+                    pixels[i] = Color.black;
+
+                
+                i++;
+            }
+        }
+        splatTexture.filterMode = FilterMode.Trilinear;
+        splatTexture.SetPixels(pixels);
+        
+        splatTexture.Apply();
+
+        meshRenderer.sharedMaterial.mainTexture = splatTexture;
     }
 
 
@@ -59,6 +91,7 @@ public class TerrainGenerator : MonoBehaviour
         terrainMeshData = new TerrainMeshData();
         AssignVertices();
         AssignTriangles();
+        AssignUVs();
 
         #region testing
         //terrainMeshData.vertices = new Vector3[(heightMap.mapSize * heightMap.mapSize) * 6];
@@ -125,8 +158,12 @@ public class TerrainGenerator : MonoBehaviour
 
         var mesh = new Mesh();
         mesh.vertices = terrainMeshData.vertices;
+        mesh.uv = terrainMeshData.uvs;
         mesh.triangles = terrainMeshData.triangles;
+
+
         mesh.RecalculateNormals();
+        mesh.RecalculateTangents();
 
         meshFilter.sharedMesh = mesh;
     }
@@ -147,7 +184,23 @@ public class TerrainGenerator : MonoBehaviour
             }
         }
     }
+    private void AssignUVs()
+    {
+        terrainMeshData.uvs = new Vector2[mapSize * mapSize];
 
+        for (int x = 0; x < mapSize; x++)
+        {
+            for (int y = 0; y < mapSize; y++)
+            {
+                terrainMeshData.uvs[(y * mapSize) + x] =
+                    new Vector2(
+                        ((float)x / mapSize ),                        
+                        ((float)y / mapSize));
+
+               
+            }
+        }
+    }
     private void AssignTriangles()
     {
         terrainMeshData.triangles = new int[((mapSize - 1) * (mapSize - 1)) * 6];
@@ -173,19 +226,20 @@ public class TerrainGenerator : MonoBehaviour
             t += 1; // Add 1 to triangle start index each time a row is finished.
         }
     }
+
     private void OnDrawGizmos()
     {
-        if (heightMap.mapArray != null)
+        for (int i = 0; i < meshFilter.sharedMesh.vertices.Length; i++)
         {
-            for (int x = 0; x < heightMap.mapSize; x++)
-            {
-                for (int y = 0; y < heightMap.mapSize; y++)
-                {
-                    float zValue = heightMap.mapArray[x, y];
-                    Gizmos.color = Color.red;
-                    Gizmos.DrawSphere(new Vector3(x * pointSpacing, zValue, y * pointSpacing), 0.25f);
-                }
-            }
+            float angle = Vector3.Angle(meshFilter.sharedMesh.normals[i], Vector3.up);
+            
+
+            if (angle <= steepness)
+                Gizmos.color = Color.green;
+            else
+                Gizmos.color = Color.red;
+            Gizmos.DrawLine(meshFilter.sharedMesh.vertices[i], meshFilter.sharedMesh.vertices[i]+ meshFilter.sharedMesh.normals[i] * 6f);
         }
     }
+
 }

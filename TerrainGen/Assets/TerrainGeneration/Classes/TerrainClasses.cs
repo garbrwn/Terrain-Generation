@@ -50,5 +50,7 @@ public class MapCell
 public class TerrainMeshData
 {
     public Vector3[] vertices;
+    public Vector2[] uvs;
     public int[] triangles;
+
 }
