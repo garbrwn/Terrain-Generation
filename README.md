@@ -20,4 +20,6 @@ Currently it will just generate a single tile, at a maximum size of 256x256 (65,
 - [ ] Roads
 - [ ] Towns
 
+[![Terrain Generation Sample Video](https://www.youtube.com/watch?v=NTL1dnTnPpo/0.jpg)](https://www.youtube.com/watch?v=NTL1dnTnPpo "Terrain Generation")
+
 Created with Unity Version 2020.3.17f1, Built in Render Pipeline.
