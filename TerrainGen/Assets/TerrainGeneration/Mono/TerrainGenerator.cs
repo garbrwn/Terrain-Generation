@@ -37,14 +37,23 @@ public class TerrainGenerator : MonoBehaviour
         BuildMesh();
     }
 
+    #region Editor
+#if UNITY_EDITOR
+    /*
+    private void OnValidate()
+    {
+        UnityEditor.EditorApplication.delayCall += _OnValidate;
+        //_OnValidate();
+    }*/
     private void OnValidate()
     {
         GenerateHeightMap();
  
         BuildMesh();
-        GenerateSplatTexture();
+        //GenerateSplatTexture();
     }
-
+#endif
+    #endregion
     private void GenerateHeightMap()
     {
         heightMap = new HeightMap(mapSize, heightMultiplier, pointSpacing, octaves, frequency, lacunarity);
@@ -62,9 +71,9 @@ public class TerrainGenerator : MonoBehaviour
             {
                 float angle = Vector3.Angle(meshFilter.sharedMesh.normals[i], Vector3.up);
                 if (angle < steepness)
-                    pixels[i] = Color.white;
-                else
                     pixels[i] = Color.black;
+                else
+                    pixels[i] = Color.blue;
 
                 
                 i++;
@@ -75,7 +84,7 @@ public class TerrainGenerator : MonoBehaviour
         
         splatTexture.Apply();
 
-        meshRenderer.sharedMaterial.mainTexture = splatTexture;
+        meshRenderer.sharedMaterial.SetTexture("_SplatMap", splatTexture);
     }
 
 
@@ -179,7 +188,7 @@ public class TerrainGenerator : MonoBehaviour
                 terrainMeshData.vertices[(y * mapSize) + x] =
                     new Vector3(
                         x * pointSpacing,
-                        heightMap.mapArray[x, y],
+                        heightMap.mapDTO.mapArray[(y * mapSize) + x],
                         y * pointSpacing);
             }
         }
@@ -227,6 +236,7 @@ public class TerrainGenerator : MonoBehaviour
         }
     }
 
+    /*
     private void OnDrawGizmos()
     {
         for (int i = 0; i < meshFilter.sharedMesh.vertices.Length; i++)
@@ -240,6 +250,6 @@ public class TerrainGenerator : MonoBehaviour
                 Gizmos.color = Color.red;
             Gizmos.DrawLine(meshFilter.sharedMesh.vertices[i], meshFilter.sharedMesh.vertices[i]+ meshFilter.sharedMesh.normals[i] * 6f);
         }
-    }
+    }*/
 
 }
